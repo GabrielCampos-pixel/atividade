@@ -1,0 +1,53 @@
+package Revisao;
+
+import java.util.Scanner;
+
+public class Atividade2 {
+    public static void main(String args[]) {
+        Scanner input = new Scanner(System.in);
+        int[] x = new int[1];
+        int[] y = new int[1];
+        int[] z = new int[1];
+
+        System.out.println("Digite 3 numeros inteiros dando espaço entre eles:");
+        x[0] = input.nextInt();
+        y[0] = input.nextInt();
+        z[0] = input.nextInt();
+
+        if(x[0] > y[0] && x[0] > z[0]) {
+            System.out.println("O valor de x é maior que os valores de y e de z");
+        }else if(y[0] > x[0] && y[0] > z[0]) {
+            System.out.println("O valor de y é maior que os valores de x e de z");
+        }else if(z[0] > x[0] && z[0] > y[0]) {
+            System.out.println("O valor de z é maior que os valores de x e de y");
+        }else{
+            System.out.println("Os valores de x,y,z são iguais");
+        }
+        if(x[0] < y[0] && x[0] < z[0]) {
+            System.out.println("O valor de x é menor que os valores de y e de z");
+        }else if(y[0] < x[0] && y[0] < z[0]) {
+            System.out.println("O valor de y é menor que os valores de x e de z");
+        }else if(z[0] < x[0] && z[0] < y[0]) {
+            System.out.println("O valor de z é menor que os valores de x e de y");
+        }else{
+            System.out.println("Os valores de x,y,z são iguais");
+        }
+        if(x[0] <= y[0] && x[0] >= z[0]) {
+            System.out.println("O valor de x está no intervalo de y e z");
+        }else{
+            System.out.println("O valor de x não está no intervalo de y e z");
+        }
+        if(y[0] !=0 && x[0] % y[0] ==0) {
+            System.out.println("O valor de x é divisível por valor de y");
+        }else{
+            System.out.println("O valor de x não é divisível por valor de y");
+        }
+        if(z[0] !=0 && x[0] % z[0] ==0) {
+            System.out.println("O valor de x é divisível por valor de z");
+        }else{
+            System.out.println("O valor de x não é divisível por valor de z");
+        }
+
+
+    }
+}
