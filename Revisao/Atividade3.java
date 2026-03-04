@@ -43,7 +43,7 @@ public class Atividade3 {
         String mesMaiorTemp = meses[0];
         String mesMenorTemp = meses[0];
 
-        for( i=1; i < temperaturas.length; i++) {
+        for(int i=1; i < temperaturas.length; i++) {
             if(temperaturas[i] > maiorTemperatura) {
                 maiorTemperatura = temperaturas[i];
                 mesMaiorTemp = meses[i];
@@ -52,7 +52,7 @@ public class Atividade3 {
                 mesMenorTemp = meses[i];
             }
         }
-        System.out.println("O mes de" + mesMaiorTemp + "teve maior media de temperatura com " + maiorTemperatura + "°C");
-        System.out.println("O mes de" + mesMenorTemp + "teve menor meda de temperatura com " + menorTemperatura + "°C");
+        System.out.println("O mes de " + mesMaiorTemp + " teve maior media de temperatura com " + maiorTemperatura + "°C");
+        System.out.println("O mes de " + mesMenorTemp + " teve menor meda de temperatura com " + menorTemperatura + "°C");
     }
 }
