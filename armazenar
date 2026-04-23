@@ -1,0 +1,462 @@
+import java.util.*;
+
+class Music {
+    private int id;
+    private String titulo;
+    private String artista;
+    private double duracao;
+
+    public Music(int id, String titulo, String artista, double duracao) {
+        this.id = id;
+        this.titulo = titulo;
+        this.artista = artista;
+        this.duracao = duracao;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public String getArtista() {
+        return artista;
+    }
+
+    public double getDuracao() {
+        return duracao;
+    }
+
+    @Override
+    public String toString() {
+        return "ID: " + id + " | " + titulo + " - " + artista + " (" + duracao + " min)";
+    }
+}
+
+class Node {
+    Music music;
+    Node prev;
+    Node next;
+
+    public Node(Music music) {
+        this.music = music;
+        this.prev = null;
+        this.next = null;
+    }
+}
+
+class Playlist {
+    private String nome;
+    private Node head;
+    private Node tail;
+
+    public Playlist(String nome) {
+        this.nome = nome;
+        this.head = null;
+        this.tail = null;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public Node getHead() {
+        return head;
+    }
+
+    public void addMusic(Music music) {
+        Node novoNo = new Node(music);
+        if (head == null) {
+            head = tail = novoNo;
+        } else {
+            tail.next = novoNo;
+            novoNo.prev = tail;
+            tail = novoNo;
+        }
+    }
+
+    public boolean removeById(int id) {
+        Node atual = head;
+        while (atual != null) {
+            if (atual.music.getId() == id) {
+                if (atual.prev != null) {
+                    atual.prev.next = atual.next;
+                } else {
+                    head = atual.next;
+                }
+                if (atual.next != null) {
+                    atual.next.prev = atual.prev;
+                } else {
+                    tail = atual.prev;
+                }
+                return true;
+            }
+            atual = atual.next;
+        }
+        return false;
+    }
+
+    public boolean removeByTitle(String titulo) {
+        Node atual = head;
+        while (atual != null) {
+            if (atual.music.getTitulo().equalsIgnoreCase(titulo)) {
+                if (atual.prev != null) {
+                    atual.prev.next = atual.next;
+                } else {
+                    head = atual.next;
+                }
+                if (atual.next != null) {
+                    atual.next.prev = atual.prev;
+                } else {
+                    tail = atual.prev;
+                }
+                return true;
+            }
+            atual = atual.next;
+        }
+        return false;
+    }
+
+    public Node findNode(int id) {
+        Node atual = head;
+        while (atual != null) {
+            if (atual.music.getId() == id) {
+                return atual;
+            }
+            atual = atual.next;
+        }
+        return null;
+    }
+
+    public void sort(String criterio) {
+        if (head == null) return;
+
+        // Coleta todos os nós em uma lista temporária para ordenar
+        List<Node> listaNos = new ArrayList<>();
+        Node atual = head;
+        while (atual != null) {
+            listaNos.add(atual);
+            atual = atual.next;
+        }
+
+        // Ordena conforme o critério (ID, título, artista ou duração)
+        listaNos.sort((a, b) -> {
+            switch (criterio) {
+                case "id":
+                    return Integer.compare(a.music.getId(), b.music.getId());
+                case "titulo":
+                    return a.music.getTitulo().compareToIgnoreCase(b.music.getTitulo());
+                case "artista":
+                    return a.music.getArtista().compareToIgnoreCase(b.music.getArtista());
+                case "duracao":
+                    return Double.compare(a.music.getDuracao(), b.music.getDuracao());
+                default:
+                    return 0;
+            }
+        });
+
+        // Reconstrói a lista duplamente encadeada
+        head = null;
+        tail = null;
+        for (Node no : listaNos) {
+            no.prev = null;
+            no.next = null;
+            if (head == null) {
+                head = tail = no;
+            } else {
+                tail.next = no;
+                no.prev = tail;
+                tail = no;
+            }
+        }
+    }
+
+    public void display() {
+        if (head == null) {
+            System.out.println("Playlist vazia.");
+            return;
+        }
+        Node atual = head;
+        while (atual != null) {
+            System.out.println(atual.music);
+            atual = atual.next;
+        }
+    }
+}
+
+public class SpotifyPlaylistSystem {
+    private static final Map<Integer, Music> biblioteca = new HashMap<>();
+    private static final Map<String, Playlist> playlists = new HashMap<>();
+    private static String playlistAtual = null;
+    private static final Scanner scanner = new Scanner(System.in);
+
+    private static void carregarBiblioteca() {
+        biblioteca.put(1, new Music(1, "Blinding Lights", "The Weeknd", 3.2));
+        biblioteca.put(2, new Music(2, "Levitating", "Dua Lipa", 3.5));
+        biblioteca.put(3, new Music(3, "Watermelon Sugar", "Harry Styles", 2.9));
+        biblioteca.put(4, new Music(4, "Save Your Tears", "The Weeknd", 3.4));
+        biblioteca.put(5, new Music(5, "Peaches", "Justin Bieber", 3.1));
+        biblioteca.put(6, new Music(6, "As It Was", "Harry Styles", 2.8));
+        biblioteca.put(7, new Music(7, "Stay", "The Kid LAROI", 2.5));
+        System.out.println("Biblioteca de músicas carregada com " + biblioteca.size() + " músicas.");
+    }
+
+    private static void exibirMenu() {
+        System.out.println("\n=====================================");
+        System.out.println("          SPOTIFY - GERENCIADOR DE PLAYLIST");
+        System.out.println("=====================================");
+        System.out.println("1. Cadastrar nova playlist");
+        System.out.println("2. Adicionar música a uma playlist");
+        System.out.println("3. Remover música da playlist");
+        System.out.println("4. Ordenar playlist");
+        System.out.println("5. Reproduzir na ordem (próxima / anterior)");
+        System.out.println("6. Exibir playlist atual");
+        System.out.println("7. Alternar entre playlists");
+        System.out.println("0. Sair");
+        System.out.print("Escolha uma opção: ");
+    }
+
+    private static void cadastrarPlaylist() {
+        System.out.print("Nome da nova playlist: ");
+        String nome = scanner.nextLine().trim();
+        if (playlists.containsKey(nome)) {
+            System.out.println("❌ Playlist com esse nome já existe!");
+            return;
+        }
+        Playlist novaPlaylist = new Playlist(nome);
+        playlists.put(nome, novaPlaylist);
+        playlistAtual = nome;
+        System.out.println("✅ Playlist '" + nome + "' cadastrada com sucesso!");
+        System.out.println("Agora vamos adicionar músicas (digite 0 para parar):");
+        adicionarMusicasIniciais(novaPlaylist);
+    }
+
+    private static void adicionarMusicasIniciais(Playlist pl) {
+        exibirBiblioteca();
+        while (true) {
+            System.out.print("ID da música para adicionar (0 para parar): ");
+            String input = scanner.nextLine().trim();
+            if (input.equals("0")) break;
+            try {
+                int id = Integer.parseInt(input);
+                Music musica = biblioteca.get(id);
+                if (musica != null) {
+                    pl.addMusic(musica);
+                    System.out.println("✅ Música adicionada!");
+                } else {
+                    System.out.println("❌ Música não encontrada na biblioteca.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("❌ ID inválido.");
+            }
+        }
+    }
+
+    private static void exibirBiblioteca() {
+        System.out.println("\n=== MÚSICAS DISPONÍVEIS NA BIBLIOTECA ===");
+        for (Music m : biblioteca.values()) {
+            System.out.println(m);
+        }
+        System.out.println("=====================================\n");
+    }
+
+    private static boolean selecionarPlaylistAtual() {
+        if (playlistAtual == null || !playlists.containsKey(playlistAtual)) {
+            System.out.println("⚠️ Nenhuma playlist selecionada.");
+            alternarPlaylist();
+            return playlistAtual != null;
+        }
+        return true;
+    }
+
+    private static void adicionarMusica() {
+        if (!selecionarPlaylistAtual()) return;
+        Playlist pl = playlists.get(playlistAtual);
+        exibirBiblioteca();
+        System.out.print("ID da música que deseja adicionar: ");
+        String input = scanner.nextLine().trim();
+        try {
+            int id = Integer.parseInt(input);
+            Music musica = biblioteca.get(id);
+            if (musica != null) {
+                pl.addMusic(musica);
+                System.out.println("✅ Música '" + musica.getTitulo() + "' adicionada à playlist '" + playlistAtual + "'.");
+            } else {
+                System.out.println("❌ Música não encontrada na biblioteca.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("❌ ID inválido.");
+        }
+    }
+
+    private static void removerMusica() {
+        if (!selecionarPlaylistAtual()) return;
+        Playlist pl = playlists.get(playlistAtual);
+        System.out.print("Digite o ID ou o título da música a remover: ");
+        String input = scanner.nextLine().trim();
+        boolean removida = false;
+        try {
+            int id = Integer.parseInt(input);
+            removida = pl.removeById(id);
+        } catch (NumberFormatException e) {
+            removida = pl.removeByTitle(input);
+        }
+        if (removida) {
+            System.out.println("✅ Música removida com sucesso!");
+        } else {
+            System.out.println("❌ Música não encontrada na playlist.");
+        }
+    }
+
+    private static void ordenarPlaylist() {
+        if (!selecionarPlaylistAtual()) return;
+        Playlist pl = playlists.get(playlistAtual);
+        System.out.println("Ordenar por:");
+        System.out.println("1. ID");
+        System.out.println("2. Título");
+        System.out.println("3. Artista");
+        System.out.println("4. Duração");
+        System.out.print("Escolha: ");
+        int op = scanner.nextInt();
+        scanner.nextLine();
+        String criterio;
+        switch (op) {
+            case 1: criterio = "id"; break;
+            case 2: criterio = "titulo"; break;
+            case 3: criterio = "artista"; break;
+            case 4: criterio = "duracao"; break;
+            default:
+                System.out.println("❌ Opção inválida.");
+                return;
+        }
+        pl.sort(criterio);
+        System.out.println("✅ Playlist ordenada por " + criterio + " com sucesso!");
+    }
+
+    private static void reproduzirNaOrdem() {
+        if (!selecionarPlaylistAtual()) return;
+        Playlist pl = playlists.get(playlistAtual);
+        if (pl.getHead() == null) {
+            System.out.println("❌ Playlist vazia.");
+            return;
+        }
+
+        pl.display();
+        System.out.print("ID da música para começar (0 = início da playlist): ");
+        String input = scanner.nextLine().trim();
+        Node atual;
+        try {
+            int id = Integer.parseInt(input);
+            atual = (id == 0) ? pl.getHead() : pl.findNode(id);
+        } catch (NumberFormatException e) {
+            atual = pl.getHead();
+        }
+        if (atual == null) atual = pl.getHead();
+
+        while (true) {
+            if (atual == null) {
+                System.out.println("\n🎵 Playlist finalizada.");
+                System.out.print("Deseja reiniciar do início? (S/N): ");
+                String resp = scanner.nextLine().trim();
+                if (resp.equalsIgnoreCase("S")) {
+                    atual = pl.getHead();
+                    continue;
+                } else {
+                    break;
+                }
+            }
+
+            Music m = atual.music;
+            System.out.println("\n▶️ Reproduzindo (" + m.getTitulo() + " - " + m.getArtista() + ")");
+
+            System.out.println("1. Reproduzir próxima");
+            System.out.println("2. Reproduzir anterior");
+            System.out.println("3. Voltar ao menu principal");
+            System.out.print("Escolha: ");
+            int escolha = scanner.nextInt();
+            scanner.nextLine();
+
+            if (escolha == 1) {
+                atual = atual.next;
+            } else if (escolha == 2) {
+                atual = atual.prev;
+            } else if (escolha == 3) {
+                break;
+            } else {
+                System.out.println("❌ Opção inválida.");
+            }
+        }
+    }
+
+    private static void exibirPlaylistAtual() {
+        if (!selecionarPlaylistAtual()) return;
+        Playlist pl = playlists.get(playlistAtual);
+        System.out.println("\n=== PLAYLIST ATUAL: " + playlistAtual + " ===");
+        pl.display();
+        System.out.println("=====================================");
+    }
+
+    private static void alternarPlaylist() {
+        if (playlists.isEmpty()) {
+            System.out.println("❌ Nenhuma playlist cadastrada ainda.");
+            return;
+        }
+        System.out.println("\n=== PLAYLISTS CADASTRADAS ===");
+        for (String nome : playlists.keySet()) {
+            System.out.println("• " + nome);
+        }
+        System.out.print("Digite o nome da playlist para alternar: ");
+        String nome = scanner.nextLine().trim();
+        if (playlists.containsKey(nome)) {
+            playlistAtual = nome;
+            System.out.println("✅ Agora trabalhando na playlist: " + nome);
+        } else {
+            System.out.println("❌ Playlist não encontrada.");
+        }
+    }
+
+    public static void main(String[] args) {
+        carregarBiblioteca();
+        System.out.println("Bem-vindo ao gerenciador de playlists do Spotify (versão com Lista Duplamente Encadeada)!");
+
+        int opcao;
+        do {
+            exibirMenu();
+            opcao = scanner.nextInt();
+            scanner.nextLine(); // limpa o buffer
+
+            switch (opcao) {
+                case 1:
+                    cadastrarPlaylist();
+                    break;
+                case 2:
+                    adicionarMusica();
+                    break;
+                case 3:
+                    removerMusica();
+                    break;
+                case 4:
+                    ordenarPlaylist();
+                    break;
+                case 5:
+                    reproduzirNaOrdem();
+                    break;
+                case 6:
+                    exibirPlaylistAtual();
+                    break;
+                case 7:
+                    alternarPlaylist();
+                    break;
+                case 0:
+                    System.out.println("👋 Saindo do sistema... Até a próxima!");
+                    break;
+                default:
+                    System.out.println("❌ Opção inválida! Tente novamente.");
+            }
+        } while (opcao != 0);
+
+        scanner.close();
+    }
+}
