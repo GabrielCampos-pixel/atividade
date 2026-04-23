@@ -195,6 +195,32 @@ public class TrabalhoSpotify {
             biblioteca.put(4, new Musica(4,"Cowboy Fora da Lei 2.0","Gusttavo Lima",3.33));
             biblioteca.put(5, new Musica(2,"Caminhonete Branca","Zé Neto & Cristiano",3.21));
             System.out.println("Foi adicionada essas musicas" + biblioteca.size() +"a biblioteca");
-        }    
-    }
+        }
+        private static void mostrarMenu() {
+            System.out.println("Sistema Spotify");
+            System.out.println("1-Cadastrar nova playlist");
+            System.out.println("2-Adicionar musica a uma playlist");
+            System.out.println("3-Remover musica da playlist");
+            System.out.println("4-Ordenar playlist");
+            System.out.println("5-Reproduzir na ordem (anterior/proxima)");
+            System.out.println("6-Mostrar playlist atual");
+            System.out.println("7-Mudar entre as playlists");
+            System.out.println("0-Sair do sistema");
+            System.out.println("Escolha uma opcao de 1 a 7 se quiser fazer algo no sistema ou escolha a opcao 0 para sair");
+        }
+        private static void adicionarNovaPlaylist() {
+            System.out.print("Digite o nome para a playlist");
+            String nome = input.nextLine().trim();
+            if(playlist.containsKey(nome)) {
+                System.out.println("Playlist com esse nome ja existe");
+                return;
+            }
+            Playlist novaPlaylist = new Playlist(nome);
+            playlists.put(nome, novaPlaylist);
+            playlistAtual = nome;
+            System.out.println("Essa playlist" + nome + "foi adicionada");
+            System.out.println("Adicionar musicas,digite 0 para sair");
+            adicionarMusicasIniciais(novaPlaylist);
+        }        
+    }    
 }
